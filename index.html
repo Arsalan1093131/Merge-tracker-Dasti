@@ -1,0 +1,197 @@
+<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Merge Tactics Tracker Pro</title>
+<style>body{font-family:Arial,sans-serif;background:#111827;color:#e5e7eb;margin:0;padding:18px}.wrap{max-width:1250px;margin:auto}.card{background:#1f2937;border:1px solid #374151;border-radius:14px;padding:16px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}input,select,button,textarea{width:100%;box-sizing:border-box;padding:9px;border-radius:8px;border:1px solid #4b5563;background:#111827;color:#eee}button{cursor:pointer;background:#374151}button.primary{background:#2563eb;border-color:#2563eb}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button.active{background:#2563eb}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}.stat{background:#111827;padding:12px;border-radius:10px}.stat b{font-size:20px;display:block;margin-top:5px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #374151;text-align:center}th{background:#111827;position:sticky;top:0}.scroll{overflow:auto;max-height:520px}.pill{display:inline-block;padding:3px 7px;border-radius:999px;background:#374151}.danger{background:#991b1b}.muted{color:#9ca3af}.ok{color:#86efac}.bad{color:#fca5a5}.hidden{display:none}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.edit{background:#7c3aed}.small{font-size:12px}</style><style id="v5-colors">:root{--a:#5b8cff;--b:#39d98a;--c:#ffd166;--d:#b084ff;--e:#38d9ff}body{background:radial-gradient(circle at 10% 0%,#17254a,transparent 30%),radial-gradient(circle at 90% 10%,#2a1749,transparent 28%),#0b1020}.card{background:linear-gradient(145deg,#17213a,#10182b)!important;border:1px solid #2b3a60!important;box-shadow:0 12px 30px #0005}.stat{border-left:4px solid var(--a)!important}.stat:nth-child(2){border-left-color:var(--b)!important}.stat:nth-child(3){border-left-color:var(--c)!important}.stat:nth-child(4){border-left-color:var(--d)!important}.stat:nth-child(5){border-left-color:var(--e)!important}.stat:nth-child(6){border-left-color:var(--b)!important}.stat:nth-child(7){border-left-color:var(--c)!important}.tabs button.active{background:linear-gradient(135deg,var(--a),var(--d))!important;border-color:transparent!important}.recent-account{border-top:3px solid var(--e)!important}input,select,textarea{background:#0c1427!important;border-color:#304365!important}</style>
+<style id="v6-rider-edit">
+.analytics-edit{min-width:54px;width:auto!important;padding:5px 9px!important}
+.card h2{background:linear-gradient(90deg,#edf2ff,#9eb9ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+</style>
+
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b1020">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+</script>
+
+</head><body><div class="wrap">
+<h1>Merge Tactics Tracker Pro v6</h1><p class="muted">ثبت کاملاً دستی — اطلاعات فقط در همین مرورگر ذخیره می‌شود. نسخه جدید امکان <b>ویرایش تک‌تک Matchها</b> را هم دارد.</p>
+<div class="card"><div class="section-title"><h2>اکانت</h2><button onclick="exportJSON()">Backup JSON</button></div><div class="tabs" id="accounts"></div></div>
+<div class="card"><div class="section-title"><h2 id="formTitle">Add Match</h2><button id="cancelEdit" class="hidden" onclick="cancelEdit()">لغو ویرایش</button></div><form id="matchForm"><input type="hidden" id="editId"><div class="grid">
+<label>Account<select id="account"></select></label><label>Date<input id="date" type="date" required></label><label>Place<select id="place"><option>1</option><option>2</option><option>3</option><option>4</option></select></label><label>Ruler<input id="ruler" placeholder="Spirit Empress"></label><label>Rider<select id="rider"><option value="">— None —</option><option>Hog Rider</option><option>Ram Rider</option><option>Prince</option><option>Dark Prince</option></select></label><label>Season<input id="season" placeholder="11"></label><label>Strategy / Build<input id="strategy" placeholder="Aggro / Economy / ..."></label>
+<label>Modifier<select id="modifier"></select></label><label id="customWrap" class="hidden">Custom Modifier<input id="customModifier"></label><label>Cups / Medals change<input id="cups" type="number" step="1" placeholder="+12 یا -8"></label><label>Note / Reason<textarea id="note" rows="2"></textarea></label></div><button class="primary" type="submit" id="submitBtn">ثبت Match</button></form></div>
+<div class="card"><div class="section-title"><h2>Dashboard</h2><span id="scope"></span></div><div class="stats" id="stats"></div></div>
+<div class="card"><h2>Goals</h2><div id="goals"></div></div>
+<div class="card"><h2>Last 5 / Last 10</h2><div id="recent"></div></div>
+<div class="card"><h2>Account Comparison</h2><div class="scroll"><table id="accountsTable"></table></div></div>
+<div class="card"><h2>Strategy Analytics</h2><div class="scroll"><table id="strategyTable"></table></div></div>
+<div class="card"><h2>Modifier Analytics</h2><div class="scroll"><table id="modifierTable"></table></div></div>
+<div class="card"><h2>Ruler Analytics</h2><div class="scroll"><table id="rulerTable"></table></div></div>
+<div class="card"><h2>Season Analytics</h2><div class="scroll"><table id="seasonTable"></table></div></div><div class="card"><h2>Rider Analytics</h2><div class="scroll"><table id="riderTable"></table></div></div>
+<div class="card"><div class="section-title"><h2>History</h2><button onclick="exportCSV()">Export CSV</button></div><div class="grid"><select id="fAccount"><option value="">All Accounts</option></select><input id="fRuler" placeholder="Filter Ruler"><input id="fSeason" placeholder="Filter Season"><input id="fStrategy" placeholder="Filter Strategy"><select id="fRider"><option value="">All Riders</option><option>Hog Rider</option><option>Ram Rider</option><option>Prince</option><option>Dark Prince</option></select><select id="fModifier"><option value="">All Modifiers</option></select><select id="fResult"><option value="">All Results</option><option value="Win">Win</option><option value="Loss">Loss</option></select></div><div class="scroll"><table id="history"></table></div></div>
+</div>
+<script>
+(function(){
+  // Cross-version migration: if this tracker starts empty, look for the data used by
+  // the earlier tracker and import it into the current app's storage format.
+  function migratePreviousTracker(){
+    try{
+      const keys = Object.keys(localStorage);
+      const currentCandidates = keys.filter(k => /merge.*tactics.*tracker/i.test(k));
+      if(!currentCandidates.length) return;
+
+      // The app below normally exposes a single storage key. Find JSON-looking values
+      // containing matches/accounts and copy only when current storage is empty.
+      let currentHasData = false;
+      for(const k of currentCandidates){
+        if(/v4/i.test(k)) continue;
+        try{
+          const obj = JSON.parse(localStorage.getItem(k));
+          if(obj && ((Array.isArray(obj.matches)&&obj.matches.length) ||
+                     (Array.isArray(obj.games)&&obj.games.length))) currentHasData = true;
+        }catch(e){}
+      }
+      if(!currentHasData) return;
+
+      // Keep a backup marker so the migration is never destructive.
+      if(!localStorage.getItem("mt_v4_migration_done")){
+        localStorage.setItem("mt_v4_previous_storage_snapshot",
+          JSON.stringify(Object.fromEntries(currentCandidates.map(k=>[k,localStorage.getItem(k)]))));
+        localStorage.setItem("mt_v4_migration_done","1");
+      }
+    }catch(e){}
+  }
+  window.mtMigratePreviousTracker = migratePreviousTracker;
+})();
+</script>
+
+<script>
+const KEY='merge_tactics_tracker_v3';
+const modifiers=['Merge Training','Trait Training','Trade Training','Equipment Training','Tile Training','Building Training',"Pandora's Bench",'Echo Bench','Jump Tile','First Free',"You're Mine",'Ouch!','Lucky Discount','Trait Dummy','Royale River','Merge Mini','Wormhole Tile','Cursed Tile','Invisibility Tile','Trait Gift','Orb Galore','Battle Royale',"Goblin's Treasure",'Four Stars','Clear Mind','Promotion'];
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{matches:[],goals:{'1':{wr:60,avg:2.2,loss:35},'2':{wr:60,avg:2.2,loss:35},'3':{wr:60,avg:2.2,loss:35}}};let active='all';
+if(!state.goals)state.goals={}; for(let i=1;i<=3;i++)state.goals[i] ||= {wr:60,avg:2.2,loss:35};
+function save(){const raw=JSON.stringify(state);localStorage.setItem(KEY,raw);if(window.mtPwaBackup)window.mtPwaBackup(state)} function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function setup(){accounts.innerHTML=['All Accounts','Account 1','Account 2','Account 3'].map((x,i)=>{let val=i===0?'all':String(i);return `<button class="${active===val?'active':''}" onclick="selectAccount('${val}')">${x}</button>`}).join('');account.innerHTML=['1','2','3'].map(x=>`<option value="${x}">Account ${x}</option>`).join('');if(active!=='all')account.value=active;modifier.innerHTML='<option value="">— None —</option>'+modifiers.map(x=>`<option>${esc(x)}</option>`).join('')+'<option value="__custom">Custom Modifier</option>';fAccount.innerHTML='<option value="">All Accounts</option>'+['1','2','3'].map(x=>`<option value="${x}">Account ${x}</option>`).join('');fModifier.innerHTML='<option value="">All Modifiers</option>'+modifiers.map(x=>`<option>${esc(x)}</option>`).join('');}
+function normalizeAccount(a){a=String(a??'').trim();let m=a.match(/(?:account\s*)?([123])$/i);return m?m[1]:a} function filtered(scope=active){scope=normalizeAccount(scope);return state.matches.filter(m=>scope==='all'||normalizeAccount(m.account)===scope)}
+function calc(ms){let n=ms.length;if(!n)return {n,wr:0,avg:0,loss:0,score:0,net:0,cups:0};return{n,wr:ms.filter(m=>m.place<=2).length/n*100,avg:ms.reduce((a,m)=>a+Number(m.place),0)/n,loss:ms.filter(m=>m.place>=3).length/n*100,score:ms.reduce((a,m)=>a+[100,75,40,15][m.place-1],0)/n,net:ms.reduce((a,m)=>a+Number(m.cups||0),0),cups:ms.reduce((a,m)=>a+Number(m.cups||0),0)/n}}
+function row(label,c){return `<div class="stat"><span>${label}</span><b>${c}</b></div>`}
+function renderStats(){let c=calc(filtered());scope.textContent=active==='all'?'All Accounts':'Account '+active;stats.innerHTML=row('Games',c.n)+row('Winrate',c.wr.toFixed(1)+'%')+row('Avg Place',c.avg.toFixed(2))+row('3rd+4th',c.loss.toFixed(1)+'%')+row('Performance Score',c.score.toFixed(1))+row('Net Cups',c.net)+row('Avg Cups/Match',c.cups.toFixed(1));}
+function renderGoals(){if(active==='all'){goals.innerHTML='<p class="muted">برای ویرایش Goal، یکی از 3 اکانت را انتخاب کن.</p>'+['1','2','3'].map(a=>goalCard(a)).join('')}else goals.innerHTML=goalCard(active)}
+function goalCard(a){let g=state.goals[a],c=calc(filtered(a));return `<div class="card"><b>Account ${a}</b><div class="grid"><label>Winrate ≥ %<input id="gwr${a}" type="number" value="${g.wr}"></label><label>Avg Place ≤<input id="gavg${a}" type="number" step="0.1" value="${g.avg}"></label><label>3rd+4th Rate ≤ %<input id="gloss${a}" type="number" value="${g.loss}"></label></div><button onclick="saveGoal('${a}')">Save Goal</button><p>${c.n?`Winrate ${c.wr.toFixed(1)}% ${c.wr>=g.wr?'✓':'✗'} | Avg ${c.avg.toFixed(2)} ${c.avg<=g.avg?'✓':'✗'} | 3rd+4th ${c.loss.toFixed(1)}% ${c.loss<=g.loss?'✓':'✗'}`:'No games yet'}</p></div>`}
+function saveGoal(a){state.goals[a]={wr:+document.getElementById('gwr'+a).value,avg:+document.getElementById('gavg'+a).value,loss:+document.getElementById('gloss'+a).value};save();render()}
+function groupTable(ms,key){
+  let mp={};
+  ms.forEach(m=>{let k=String(m[key]??'').trim()||'—';(mp[k]??=[]).push(m)});
+  return Object.entries(mp).sort((a,b)=>b[1].length-a[1].length).map(([k,v])=>{
+    let c=calc(v);
+    let edit=k==='—'?'':`<button class="edit small" onclick="editGroup('${key}',${JSON.stringify(k)})">Edit</button>`;
+    return `<tr><td>${esc(k)}</td><td>${c.n}</td><td>${c.wr.toFixed(1)}%</td><td>${c.avg.toFixed(2)}</td><td>${c.loss.toFixed(1)}%</td><td>${c.score.toFixed(1)}</td><td>${c.net}</td><td>${c.cups.toFixed(1)}</td><td>${edit}</td></tr>`;
+  }).join('')
+}
+function table(el,rows){document.getElementById(el).innerHTML='<thead><tr><th>Group</th><th>Games</th><th>Winrate</th><th>Avg Place</th><th>3rd+4th</th><th>Score</th><th>Net Cups</th><th>Avg Cups</th><th>Edit</th></tr></thead><tbody>'+rows+'</tbody>'}
+function renderAnalytics(){let ms=filtered();table('strategyTable',groupTable(ms,'strategy'));table('modifierTable',groupTable(ms,'modifier'));table('rulerTable',groupTable(ms,'ruler'));table('seasonTable',groupTable(ms,'season'));table('riderTable',groupTable(ms,'rider'));let at=['1','2','3'].map(a=>{let c=calc(filtered(a));return `<tr><td>Account ${a}</td><td>${c.n}</td><td>${c.wr.toFixed(1)}%</td><td>${c.avg.toFixed(2)}</td><td>${(100-c.loss).toFixed(1)}%</td><td>${c.loss.toFixed(1)}%</td><td>${c.score.toFixed(1)}</td><td>${c.net}</td><td>${c.cups.toFixed(1)}</td></tr>`}).join('');accountsTable.innerHTML='<thead><tr><th>Account</th><th>Games</th><th>Winrate</th><th>Avg Place</th><th>Top-2</th><th>3rd+4th</th><th>Score</th><th>Net Cups</th><th>Avg Cups</th></tr></thead><tbody>'+at+'</tbody>'}
+function renderRecent(){let scopes=active==='all'?['1','2','3']:[active];recent.innerHTML=scopes.map(a=>{let ms=filtered(a).slice().sort((x,y)=>new Date(y.date)-new Date(x.date)||y.created-x.created),l5=ms.slice(0,5),l10=ms.slice(0,10),ca=calc(l5),cb=calc(l10),seq=l5.map(m=>m.place).join(' → ')||'—';return `<div class="card recent-account"><h3>Account ${a}</h3><p><b>Last 5 placements:</b> ${seq}</p><p><b>Last 5 Net Cups:</b> ${ca.net>=0?'+':''}${ca.net} | <b>Avg Cups:</b> ${ca.cups.toFixed(1)}</p><p><b>Last 10 Winrate:</b> ${cb.wr.toFixed(1)}% | <b>Avg Place:</b> ${cb.n?cb.avg.toFixed(2):'0.00'} | <b>Net Cups:</b> ${cb.net>=0?'+':''}${cb.net} | <b>Avg Cups:</b> ${cb.cups.toFixed(1)}</p></div>`}).join('')}
+function renderHistory(){let q=x=>document.getElementById(x).value.toLowerCase();let ms=state.matches.filter(m=>(!fAccount.value||m.account===fAccount.value)&&(!q('fRuler')||m.ruler.toLowerCase().includes(q('fRuler')))&&(!q('fSeason')||m.season.toLowerCase().includes(q('fSeason')))&&(!fRider.value||m.rider===fRider.value)&&(!q('fStrategy')||m.strategy.toLowerCase().includes(q('fStrategy')))&&(!fModifier.value||m.modifier===fModifier.value)&&(!fResult.value||(m.place<=2?'Win':'Loss')===fResult.value)).sort((a,b)=>new Date(b.date)-new Date(a.date)||b.created-a.created);history.innerHTML='<thead><tr><th>Date</th><th>Account</th><th>Place</th><th>Result</th><th>Ruler</th><th>Rider</th><th>Season</th><th>Strategy</th><th>Modifier</th><th>Cups</th><th>Note</th><th>Edit</th><th>Delete</th></tr></thead><tbody>'+ms.map(m=>`<tr><td>${esc(m.date)}</td><td>${m.account}</td><td>${m.place}</td><td>${m.place<=2?'<span class="ok">Win</span>':'<span class="bad">Loss</span>'}</td><td>${esc(m.ruler)}</td><td>${esc(m.rider||'')}</td><td>${esc(m.season)}</td><td>${esc(m.strategy)}</td><td>${esc(m.modifier)}</td><td>${m.cups>=0?'+':''}${m.cups||0}</td><td>${esc(m.note)}</td><td><button class="edit" onclick="editMatch('${m.id}')">Edit</button></td><td><button class="danger" onclick="deleteMatch('${m.id}')">Delete</button></td></tr>`).join('')+'</tbody>'}
+function selectAccount(a){active=String(a);render()}
+function migrateLegacy(){if(state.matches.length)return;for(const k of Object.keys(localStorage)){if(k===KEY)continue;try{const v=JSON.parse(localStorage.getItem(k));let ms=Array.isArray(v)?v:(v&&Array.isArray(v.matches)?v.matches:(v&&Array.isArray(v.games)?v.games:null));if(!ms||!ms.length)continue;state.matches=ms.map((m,i)=>({id:m.id||('legacy_'+i+'_'+Date.now()),created:m.created||m.timestamp||Date.now()+i,account:normalizeAccount(m.account||m.accountName||m.acc||'1')||'1',date:m.date||m.day||'',place:Number(m.place||m.placement||m.rank||4),ruler:String(m.ruler||m.hero||''),rider:String(m.rider||''),season:String(m.season||''),strategy:String(m.strategy||m.build||''),modifier:String(m.modifier||''),cups:Number(m.cups??m.medals??m.cupChange??0),note:String(m.note||m.reason||'')}));if(v&&v.goals)state.goals={...state.goals,...v.goals};save();break}catch(e){}}}
+migrateLegacy();
+function render(){setup();renderStats();renderGoals();renderRecent();renderAnalytics();renderHistory();}
+modifier.onchange=()=>customWrap.classList.toggle('hidden',modifier.value!=='__custom');matchForm.onsubmit=e=>{e.preventDefault();let eid=editId.value;let custom=modifier.value==='__custom'?customModifier.value.trim():'';let obj={id:eid||id(),created:eid?(state.matches.find(m=>m.id===eid)?.created||Date.now()):Date.now(),account:account.value,date:date.value,place:+place.value,ruler:ruler.value.trim(),rider:rider.value,season:season.value.trim(),strategy:strategy.value.trim(),modifier:custom||modifier.value,cups:Number(cups.value||0),note:note.value.trim()};if(eid){let i=state.matches.findIndex(m=>m.id===eid);if(i>=0)state.matches[i]=obj}else state.matches.push(obj);save();cancelEdit();render()};
+function editMatch(i){let m=state.matches.find(x=>x.id===i);if(!m)return;editId.value=m.id;account.value=normalizeAccount(m.account);date.value=m.date;place.value=m.place;ruler.value=m.ruler;rider.value=m.rider||'';season.value=m.season;strategy.value=m.strategy;cups.value=m.cups;note.value=m.note;if(modifiers.includes(m.modifier)){modifier.value=m.modifier;customWrap.classList.add('hidden')}else{modifier.value='__custom';customWrap.classList.remove('hidden');customModifier.value=m.modifier}formTitle.textContent='Edit Match';submitBtn.textContent='Save Changes';cancelEdit.classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'})}
+function cancelEdit(){editId.value='';formTitle.textContent='Add Match';submitBtn.textContent='ثبت Match';cancelEdit.classList.add('hidden');matchForm.reset();account.value=active==='all'?'1':active;customWrap.classList.add('hidden')}
+function editGroup(key,oldValue){
+  const label={strategy:'Strategy / Build',modifier:'Modifier',ruler:'Ruler',season:'Season',rider:'Rider'}[key]||key;
+  const next=prompt('Edit '+label+'\\nCurrent: '+oldValue+'\\n\\nEnter the new value:',oldValue);
+  if(next===null)return;
+  const v=next.trim();
+  if(!v || v===oldValue)return;
+  let count=0;
+  state.matches.forEach(m=>{if(String(m[key]??'').trim()===oldValue){m[key]=v;count++}});
+  if(count){save();render();}
+}
+function deleteMatch(i){if(confirm('Delete this match?')){state.matches=state.matches.filter(m=>m.id!==i);save();render()}}
+function exportJSON(){let blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='merge-tactics-backup.json';a.click()}
+function exportCSV(){let cols=['date','account','place','ruler','season','strategy','modifier','cups','note'];let s=[cols.join(','),...state.matches.map(m=>cols.map(k=>`"${String(m[k]??'').replaceAll('"','""')}"`).join(','))].join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/csv;charset=utf-8'}));a.download='merge-tactics-history.csv';a.click()}
+['fAccount','fRuler','fSeason','fStrategy','fRider','fModifier','fResult'].forEach(x=>document.getElementById(x).addEventListener('input',renderHistory));render();
+</script>
+<script>
+(function(){
+  window.importPreviousTrackerData = function(){
+    try{
+      const all = Object.keys(localStorage);
+      const candidates = all.filter(k => /merge.*tactics.*tracker/i.test(k));
+      const found = [];
+      for(const k of candidates){
+        try{
+          const v = JSON.parse(localStorage.getItem(k));
+          if(v && (v.matches || v.games || v.data || v.accounts)) found.push({key:k,value:v});
+        }catch(e){}
+      }
+      return found;
+    }catch(e){ return []; }
+  };
+  if(window.mtMigratePreviousTracker) window.mtMigratePreviousTracker();
+})();
+</script>
+
+
+<script id="v6-normalize">
+(function(){
+  try{
+    const s=JSON.parse(localStorage.getItem('merge_tactics_tracker_v3')||'null');
+    if(s && Array.isArray(s.matches)){
+      let changed=false;
+      s.matches.forEach(m=>{if(m.rider===undefined){m.rider='';changed=true}});
+      if(changed)localStorage.setItem('merge_tactics_tracker_v3',JSON.stringify(s));
+    }
+  }catch(e){}
+})();
+</script>
+
+
+<script id="pwa-storage-resilience">
+(function(){
+  const DB='MergeTacticsTrackerDB', STORE='snapshots';
+  function dbOpen(){
+    return new Promise((resolve,reject)=>{
+      const r=indexedDB.open(DB,1);
+      r.onupgradeneeded=()=>r.result.createObjectStore(STORE,{keyPath:'id'});
+      r.onsuccess=()=>resolve(r.result);
+      r.onerror=()=>reject(r.error);
+    });
+  }
+  window.mtPwaBackup = async function(state){
+    try{
+      const db=await dbOpen(), tx=db.transaction(STORE,'readwrite');
+      tx.objectStore(STORE).put({id:'latest', savedAt:Date.now(), state:JSON.stringify(state)});
+    }catch(e){}
+  };
+  window.mtPwaRestore = async function(){
+    try{
+      const db=await dbOpen();
+      return await new Promise((resolve,reject)=>{
+        const r=db.transaction(STORE,'readonly').objectStore(STORE).get('latest');
+        r.onsuccess=()=>resolve(r.result||null); r.onerror=()=>reject(r.error);
+      });
+    }catch(e){return null}
+  };
+  // Add a recovery button only if localStorage is empty but an IndexedDB snapshot exists.
+  window.addEventListener('load', async ()=>{
+    const key='merge_tactics_tracker_v3';
+    const local=localStorage.getItem(key);
+    if(!local && window.mtPwaRestore){
+      const snap=await window.mtPwaRestore();
+      if(snap && snap.state){
+        try{
+          localStorage.setItem(key,snap.state);
+          location.reload();
+        }catch(e){}
+      }
+    }
+  });
+})();
+</script>
+
+</body></html>
